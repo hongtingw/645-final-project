@@ -1,0 +1,7 @@
+# CLion files
+cmake-build-*
+.idea
+
+# Data and model
+data
+model
