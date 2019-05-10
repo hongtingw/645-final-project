@@ -4,13 +4,7 @@ InferenceEngine::InferenceEngine(const std::string &model_path, const std::strin
   // TODO
 }
 
-int InferenceEngine::predict(const MnistImage &image) {
+uchar InferenceEngine::predict(const GreyscaleImage &image) {
   // TODO
   return 0;
-}
-
-InferenceEngine::Tensor<2> InferenceEngine::multiply(const InferenceEngine::Tensor<2> &a,
-                                                     const InferenceEngine::Tensor<2> &b) {
-  // TODO
-  return InferenceEngine::Tensor<2>();
 }
