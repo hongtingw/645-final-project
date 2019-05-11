@@ -1,4 +1,5 @@
 #include <iostream>
+#include <opencv2/core/mat.hpp>
 #include "MnistReader.h"
 
 inline int readInt(std::istream& in) {
@@ -34,10 +35,10 @@ MnistReader::MnistReader(const std::string &mnist_image_path, const std::string 
   std::cout << num_images_ << " images available." << std::endl;
 }
 
-bool MnistReader::next(GreyscaleImage &image, uchar &label) {
+bool MnistReader::next(cv::Mat& img, uchar &label) {
   if (cnt_ < num_images_) {
-    image.resize(std::array<int, 2>{image_rows_, image_cols_});
-    image_fin_.read(reinterpret_cast<char *>(image.data()), image_rows_ * image_cols_ * sizeof(uchar));
+    img = cv::Mat(image_rows_, image_cols_, CV_8U);
+    image_fin_.read(reinterpret_cast<char *>(img.data), image_rows_ * image_cols_ * sizeof(uchar));
     label_fin_.read(reinterpret_cast<char *>(&label), sizeof(uchar));
     ++cnt_;
     return true;

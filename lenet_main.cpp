@@ -6,7 +6,7 @@
 int main() {
   InferenceEngine inference_engine("model/lenet_model.json", "model/lenet_weights.bin");
   MnistReader mnist_reader("data/t10k-images-idx3-ubyte", "data/t10k-labels-idx1-ubyte");
-  GreyscaleImage image{};
+  cv::Mat image;
   uchar label;
   int num_samples = 0;
   int num_correct = 0;

@@ -2,13 +2,12 @@
 #define LENET_INFERENCE_ESTIMATOR_H
 
 #include <string>
-#include "GreyscaleImage.h"
-#include "Tensor.h"
+#include <opencv2/opencv.hpp>
 
 class InferenceEngine {
  public:
   InferenceEngine(const std::string& model_path, const std::string& weights_path);
-  uchar predict(const GreyscaleImage& image);
+  uchar predict(const cv::Mat& image);
  private:
   /**
    * Multiply 2 matrices.
@@ -17,8 +16,19 @@ class InferenceEngine {
    * @return Product of the 2 matrices.
    */
   template <typename DTYPE>
-  Tensor<DTYPE, 2> multiply(const Tensor<DTYPE, 2>& a, const Tensor<DTYPE, 2>& b) {
-    // TODO(Zhe Yang): Implement 2D matrix multiplication here.
+  cv::Mat multiply(const cv::Mat& a, const cv::Mat& b) {
+    // TODO(Zhe Yang): Optimize 2D matrix multiplication here.
+    assert(a.cols == b.rows);
+    cv::Mat c(a.rows, b.cols, a.type());
+    DTYPE* p = c.data;
+    for (int i = 0; i < a.rows; ++i) {
+      for (int j = 0; j < b.cols; ++j) {
+        for (int k = 0; k < a.cols; ++k) {
+          (*p++) = a.at<DTYPE>(i, j) * b.at<DTYPE>(j, k);
+        }
+      }
+    }
+    return c;
   }
 };
 

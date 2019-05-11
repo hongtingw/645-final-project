@@ -4,4 +4,16 @@ project(lenet_inference)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(lenet_inference lenet_main.cpp MnistReader.cpp InferenceEngine.cpp GreyscaleImage.cpp)
+# Enable SSE 4.2
+if((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+    add_compile_options(-msse4.2)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    add_compile_options(/QxSSE4.2)
+elseif((CMAKE_CXX_COMPILER_ID MATCHES "MSVC") AND NOT CMAKE_CL_64)
+    add_compile_options(/arch:SSE2) # VC doesn't support SSE4.2
+endif()
+
+find_package(OpenCV REQUIRED)
+
+add_executable(lenet_inference lenet_main.cpp MnistReader.cpp InferenceEngine.cpp)
+target_link_libraries(lenet_inference ${OpenCV_LIBS})

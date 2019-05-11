@@ -4,8 +4,6 @@
 #include <string>
 #include <fstream>
 
-#include "GreyscaleImage.h"
-
 class MnistReader {
  public:
   MnistReader(const std::string& mnist_image_path, const std::string& mnist_label_path);
@@ -18,7 +16,7 @@ class MnistReader {
    * @param label 0-9 label of the sample.
    * @return true on success; false on reaching the end of the dataset.
    */
-  bool next(GreyscaleImage& image, uchar& label);
+  bool next(cv::Mat& img, uchar& label);
  private:
   int num_images_;
   int image_rows_;

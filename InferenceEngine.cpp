@@ -4,7 +4,7 @@ InferenceEngine::InferenceEngine(const std::string &model_path, const std::strin
   // TODO
 }
 
-uchar InferenceEngine::predict(const GreyscaleImage &image) {
+uchar InferenceEngine::predict(const cv::Mat& image) {
   // TODO
   return 0;
 }
