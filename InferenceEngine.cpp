@@ -1,45 +1,68 @@
 #include "InferenceEngine.h"
+#include <nlohmann/json.hpp>
+#include "layers/LayerFactory.h"
+
+using json = nlohmann::json;
 
 InferenceEngine::InferenceEngine(const std::string &model_path,
                                  const std::string &weights_path,
-                                 MatMulImpl mat_mul_impl)
-    : mat_mul_impl_(mat_mul_impl) {
-  // TODO
+                                 Blas::MatOpImpl mat_op_impl) {
+  std::shared_ptr<Blas> blas = std::make_shared<Blas>(mat_op_impl);
+
+  std::ifstream model_fin(model_path);
+  json model_json;
+  model_fin >> model_json;
+  json layers_json = model_json["config"]["layers"];
+
+  cv::Size x_shape;
+  for (const auto &layer_json : layers_json) {
+    std::unique_ptr<Layer> layer;
+    const std::string layer_name = layer_json["class_name"].get<std::string>();
+    const auto layer_config = layer_json["config"];
+    if (layer_config.find("batch_input_shape") != layer_config.end()) {
+      auto batch_input_shape = layer_config["batch_input_shape"];
+      std::vector<int> dims;
+      for (auto dim_json : batch_input_shape) {
+        if (!dim_json.is_null()) {
+          dims.emplace_back(dim_json.get<int>());
+        }
+      }
+      CV_CheckEQ(dims.size(), 2L, "Currently only support 2 dimensional input!");
+      x_shape = cv::Size(dims[1], dims[0]);
+    }
+    if (layer_name == "Dense") {
+      // TODO(Hongting Wang): Read and fill in parameters.
+      int num_output_units = layer_config["units"].get<int>();
+      cv::Mat w(num_output_units, x_shape.area(), CV_32F);
+      cv::Mat b(num_output_units, 1, CV_32F);
+      layer = std::make_unique<DenseLayer>(w, b, blas);
+    } else if (layer_name == "Flatten") {
+      layer = std::make_unique<FlattenLayer>(x_shape);
+    } else {
+      std::cout << layer_name << " layers are unsupported or ignored!" << std::endl;
+      continue;
+    }
+
+    x_shape = layer->outputShape();
+    layers_.emplace_back(std::move(layer));
+  }
 }
 
 uchar InferenceEngine::predict(const cv::Mat &image) {
-  // TODO
-  return 0;
-}
-
-cv::Mat InferenceEngine::multiplyOpenCV(const cv::Mat &a, const cv::Mat &b) {
-  return a * b;
-}
-
-cv::Mat InferenceEngine::multiplyOptimized(const cv::Mat &a, const cv::Mat &b) {
-  // TODO(Zhe Yang): Optimize 2D matrix multiplication here.
-  return a * b;
-}
-
-cv::Mat InferenceEngine::multiplyNaive(const cv::Mat &a, const cv::Mat &b) {
-  CV_CheckEQ(a.cols, b.rows, "Matrix dimensions do not match!");
-  CV_CheckEQ(a.type(), CV_32F, "Matrix A is of wrong type!");
-  CV_CheckEQ(b.type(), CV_32F, "Matrix B is of wrong type!");
-  cv::Mat c = cv::Mat::zeros(cv::Size(a.rows, b.cols), a.type());
-  for (int i = 0; i < a.rows; ++i) {
-    for (int j = 0; j < b.cols; ++j) {
-      for (int k = 0; k < a.cols; ++k) {
-        c.at<float>(i, j) += a.at<float>(i, j) * b.at<float>(j, k);
-      }
+  cv::Mat x;
+  image.convertTo(x, CV_32F);
+  for (auto& layer : layers_) {
+    x = layer->forward(x);
+  }
+  CV_CheckEQ(x.rows, 10, "Network output has unexpected number of rows!");
+  CV_CheckEQ(x.cols, 1, "Network output has unexpected number of columns!");
+  uchar prediction = 0;
+  float max_prob = x.at<float>(0);
+  for (int i = 1; i < 10; ++i) {
+    if (max_prob < x.at<float>(i)) {
+      max_prob = x.at<float>(i);
+      prediction = static_cast<uchar>(i);
     }
   }
-  return c;
-}
-
-cv::Mat InferenceEngine::multiply(const cv::Mat &a, const cv::Mat &b) {
-  switch (mat_mul_impl_) {
-    case NAIVE:return multiplyNaive(a, b);
-    case OPENCV:return multiplyOpenCV(a, b);
-    case OPT:return multiplyOptimized(a, b);
-  }
+  return prediction;
 }

@@ -15,5 +15,7 @@ endif()
 
 find_package(OpenCV REQUIRED)
 
-add_executable(lenet_inference lenet_main.cpp MnistReader.cpp InferenceEngine.cpp)
-target_link_libraries(lenet_inference ${OpenCV_LIBS})
+add_subdirectory(json)
+
+add_executable(lenet_inference lenet_main.cpp MnistReader.cpp InferenceEngine.cpp layers/Layer.h layers/DenseLayer.cpp layers/DenseLayer.h layers/FlattenLayer.cpp layers/FlattenLayer.h blas/Blas.cpp blas/Blas.h layers/LayerFactory.h)
+target_link_libraries(lenet_inference PRIVATE ${OpenCV_LIBS} nlohmann_json::nlohmann_json)
