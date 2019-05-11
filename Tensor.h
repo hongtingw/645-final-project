@@ -5,6 +5,15 @@
 #include <vector>
 #include <array>
 
+#ifndef aligned_alloc
+// This may happen on OS X. Use POSIX's memalign to fake one.
+inline void *aligned_alloc(size_t alignment, size_t size) {
+  void *p;
+  posix_memalign(&p, alignment, size);
+  return p;
+}
+#endif
+
 /**
  * @tparam N_DIM Number of dimension of the tensor.
  */
