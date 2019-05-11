@@ -14,7 +14,7 @@ class Blas {
     OPT,
   };
 
-  inline Blas(MatOpImpl mat_mul_impl) : mat_op_impl_(mat_mul_impl) {}
+  inline explicit Blas(MatOpImpl mat_mul_impl) : mat_op_impl_(mat_mul_impl) {}
 
   /**
    * Multiplication of 2 given matrices. Implementation is specified on construction.
