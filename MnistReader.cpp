@@ -30,6 +30,8 @@ MnistReader::MnistReader(const std::string &mnist_image_path, const std::string 
   assert(magic_number == 2049);
   int num_labels = readInt(label_fin_);
   assert(num_labels == num_images_);
+
+  std::cout << num_images_ << " images available." << std::endl;
 }
 
 bool MnistReader::next(GreyscaleImage &image, uchar &label) {
@@ -38,6 +40,9 @@ bool MnistReader::next(GreyscaleImage &image, uchar &label) {
     image_fin_.read(reinterpret_cast<char *>(image.data()), image_rows_ * image_cols_ * sizeof(uchar));
     label_fin_.read(reinterpret_cast<char *>(&label), sizeof(uchar));
     ++cnt_;
+    return true;
+  } else {
+    return false;
   }
 }
 
