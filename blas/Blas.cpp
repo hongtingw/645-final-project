@@ -1,4 +1,5 @@
 #include "Blas.h"
+#include <glog/logging.h>
 
 cv::Mat Blas::multiplyOpenCV(const cv::Mat &a, const cv::Mat &b) {
   return a * b;
@@ -10,14 +11,14 @@ cv::Mat Blas::multiplyOptimized(const cv::Mat &a, const cv::Mat &b) {
 }
 
 cv::Mat Blas::multiplyNaive(const cv::Mat &a, const cv::Mat &b) {
-  CV_CheckEQ(a.cols, b.rows, "Matrix dimensions do not match!");
-  CV_CheckEQ(a.type(), CV_32F, "Matrix A is of unsupported type!");
-  CV_CheckEQ(b.type(), CV_32F, "Matrix B is of unsupported type!");
-  cv::Mat c = cv::Mat::zeros(cv::Size(a.rows, b.cols), a.type());
+  CHECK_EQ(a.cols, b.rows) << "Cannot multiply matrices with size " << a.size() << " and " << b.size() << "!";
+  CHECK_EQ(a.type(), CV_32F) << "Matrix A is of unsupported type!";
+  CHECK_EQ(b.type(), CV_32F) << "Matrix B is of unsupported type!";
+  cv::Mat c = cv::Mat::zeros(cv::Size(b.cols, a.rows), a.type());
   for (int i = 0; i < a.rows; ++i) {
     for (int j = 0; j < b.cols; ++j) {
       for (int k = 0; k < a.cols; ++k) {
-        c.at<float>(i, j) += a.at<float>(i, j) * b.at<float>(j, k);
+        c.at<float>(i, j) += a.at<float>(i, k) * b.at<float>(k, j);
       }
     }
   }
@@ -42,11 +43,10 @@ cv::Mat Blas::addOptimized(const cv::Mat &a, const cv::Mat &b) {
 }
 
 cv::Mat Blas::addNaive(const cv::Mat &a, const cv::Mat &b) {
-  CV_CheckEQ(a.rows, b.rows, "Matrix rows do not match!");
-  CV_CheckEQ(a.cols, b.cols, "Matrix columns do not match!");
-  CV_CheckEQ(a.type(), CV_32F, "Matrix A is of unsupported type!");
-  CV_CheckEQ(b.type(), CV_32F, "Matrix B is of unsupported type!");
-  cv::Mat c(cv::Size(a.rows, a.cols), a.type());
+  CHECK_EQ(a.size(), b.size()) << "Matrix sizes do not match!";
+  CHECK_EQ(a.type(), CV_32F) << "Matrix A is of unsupported type!";
+  CHECK_EQ(b.type(), CV_32F) << "Matrix B is of unsupported type!";
+  cv::Mat c(cv::Size(a.cols, a.rows), a.type());
   for (int i = 0; i < a.rows; ++i) {
     for (int j = 0; j < b.cols; ++j) {
       c.at<float>(i, j) = a.at<float>(i, j) + b.at<float>(i, j);

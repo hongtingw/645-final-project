@@ -9,5 +9,5 @@ cv::Mat FlattenLayer::forward(const cv::Mat &input) {
 }
 
 cv::Size FlattenLayer::outputShape() const {
-  return cv::Size(input_size_.area(), 1);
+  return cv::Size(1, input_size_.area());
 }

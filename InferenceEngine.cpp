@@ -1,4 +1,5 @@
 #include "InferenceEngine.h"
+#include <glog/logging.h>
 #include <nlohmann/json.hpp>
 #include "layers/LayerFactory.h"
 
@@ -10,14 +11,15 @@ InferenceEngine::InferenceEngine(const std::string &model_path,
   std::shared_ptr<Blas> blas = std::make_shared<Blas>(mat_op_impl);
 
   std::ifstream model_fin(model_path);
+  CHECK(model_fin.is_open()) << "Unable to open model JSON file at " << model_path;
   json model_json;
   model_fin >> model_json;
   json layers_json = model_json["config"]["layers"];
-
   cv::Size x_shape;
   for (const auto &layer_json : layers_json) {
     std::unique_ptr<Layer> layer;
-    const std::string layer_name = layer_json["class_name"].get<std::string>();
+    const std::string layer_class_name = layer_json["class_name"].get<std::string>();
+    LOG(INFO) << layer_class_name;
     const auto layer_config = layer_json["config"];
     if (layer_config.find("batch_input_shape") != layer_config.end()) {
       auto batch_input_shape = layer_config["batch_input_shape"];
@@ -27,19 +29,21 @@ InferenceEngine::InferenceEngine(const std::string &model_path,
           dims.emplace_back(dim_json.get<int>());
         }
       }
-      CV_CheckEQ(dims.size(), 2L, "Currently only support 2 dimensional input!");
+      CHECK_EQ(dims.size(), 2L) << "Currently only support 2 dimensional input!";
       x_shape = cv::Size(dims[1], dims[0]);
     }
-    if (layer_name == "Dense") {
+    if (layer_class_name == "Dense") {
       // TODO(Hongting Wang): Read and fill in parameters.
       int num_output_units = layer_config["units"].get<int>();
       cv::Mat w(num_output_units, x_shape.area(), CV_32F);
       cv::Mat b(num_output_units, 1, CV_32F);
       layer = std::make_unique<DenseLayer>(w, b, blas);
-    } else if (layer_name == "Flatten") {
+      LOG(INFO) << "Constructed Dense layer";
+    } else if (layer_class_name == "Flatten") {
       layer = std::make_unique<FlattenLayer>(x_shape);
+      LOG(INFO) << "Constructed Flatten layer";
     } else {
-      std::cout << layer_name << " layers are unsupported or ignored!" << std::endl;
+      LOG(INFO) << "Layer class " << layer_class_name << " is unsupported or ignored!";
       continue;
     }
 

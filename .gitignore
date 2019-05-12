@@ -5,3 +5,6 @@ cmake-build-*
 # Data and model
 data
 model
+
+# Binaries
+build

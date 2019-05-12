@@ -1,9 +1,12 @@
 #include <iostream>
+#include <glog/logging.h>
 
 #include "InferenceEngine.h"
 #include "MnistReader.h"
 
 int main(int argc, char* argv[]) {
+  google::InitGoogleLogging(argv[0]);
+
   Blas::MatOpImpl mat_op_impl = Blas::MatOpImpl::NAIVE;
   if (argc > 1) {
     char* mat_mul_impl_name = argv[1];

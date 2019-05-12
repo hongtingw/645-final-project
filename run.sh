@@ -4,5 +4,9 @@ mkdir -p build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j
-cd ..
-./build/lenet_main
+if [[ $? -eq 0 ]]; then
+    cd ..
+    ./build/lenet_inference opencv --logtostderr=1
+else
+    cd ..
+fi
