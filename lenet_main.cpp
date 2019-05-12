@@ -2,7 +2,8 @@
 #include <glog/logging.h>
 #include <gflags/gflags.h>
 #include <chrono>
-
+#include <ctime>
+#include <iomanip>
 #include "InferenceEngine.h"
 #include "MnistReader.h"
 #include "InferencePipeline.h"
@@ -41,11 +42,13 @@ int main(int argc, char *argv[]) {
   MnistReader mnist_reader("data/t10k-images-idx3-ubyte", "data/t10k-labels-idx1-ubyte");
   InferencePipeline pipeline(InferencePipeline::PipelineType::SEQUENTIAL, FLAGS_batch_size);
 
-  const std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+  const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+//  const std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
   const double accuracy = pipeline.test(inference_engine, mnist_reader);
 
-  const std::chrono::time_point end = std::chrono::high_resolution_clock::now();
+  const std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+//  const std::chrono::time_point end = std::chrono::high_resolution_clock::now();
   const std::chrono::duration<double, std::milli> total_time = end - start;
   const double avg_inference_time = total_time.count() / mnist_reader.getNumSamples();
 

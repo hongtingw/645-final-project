@@ -2,7 +2,7 @@
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 mkdir -p build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_MODULE_PATH=/home/ubuntu/645-final-project/cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j
 if [[ $? -eq 0 ]]; then
     cd ..

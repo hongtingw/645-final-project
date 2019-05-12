@@ -2,6 +2,7 @@
 #include <glog/logging.h>
 #include <nlohmann/json.hpp>
 #include "layers/LayerFactory.h"
+#include <fstream>
 
 using json = nlohmann::json;
 
