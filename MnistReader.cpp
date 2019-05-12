@@ -23,7 +23,7 @@ MnistReader::MnistReader(const std::string &mnist_image_path, const std::string 
   // Read the header of the image file.
   magic_number = readInt(image_fin_);
   assert(magic_number == 2051);
-  num_images_ = readInt(image_fin_);
+  num_samples_ = readInt(image_fin_);
   image_rows_ = readInt(image_fin_);
   image_cols_ = readInt(image_fin_);
 
@@ -31,13 +31,11 @@ MnistReader::MnistReader(const std::string &mnist_image_path, const std::string 
   magic_number = readInt(label_fin_);
   assert(magic_number == 2049);
   int num_labels = readInt(label_fin_);
-  assert(num_labels == num_images_);
-
-  LOG(INFO) << num_images_ << " samples available.";
+  assert(num_labels == num_samples_);
 }
 
 bool MnistReader::next(cv::Mat& img, uchar &label) {
-  if (cnt_ < num_images_) {
+  if (cnt_ < num_samples_) {
     img = cv::Mat(image_rows_, image_cols_, CV_8U);
     image_fin_.read(reinterpret_cast<char *>(img.data), image_rows_ * image_cols_ * sizeof(uchar));
     label_fin_.read(reinterpret_cast<char *>(&label), sizeof(uchar));

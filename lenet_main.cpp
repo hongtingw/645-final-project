@@ -4,6 +4,7 @@
 
 #include "InferenceEngine.h"
 #include "MnistReader.h"
+#include "InferencePipeline.h"
 
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
@@ -25,24 +26,21 @@ int main(int argc, char* argv[]) {
       return -1;
     }
   }
+
   InferenceEngine inference_engine("model/lenet_model.json", "model/lenet_weights.bin", mat_op_impl);
   MnistReader mnist_reader("data/t10k-images-idx3-ubyte", "data/t10k-labels-idx1-ubyte");
-  cv::Mat image;
-  uchar label;
-  int num_samples = 0;
-  int num_correct = 0;
+
   const std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-  while (mnist_reader.next(image, label)) {
-    ++num_samples;
-    uchar pred = inference_engine.predict(image);
-    if (pred == label) {
-      ++num_correct;
-    }
-  }
+
+  InferencePipeline pipeline(InferencePipeline::PipelineType::SEQUENTIAL);
+  const double accuracy = pipeline.test(inference_engine, mnist_reader);
+
   const std::chrono::time_point end = std::chrono::high_resolution_clock::now();
   const std::chrono::duration<double, std::milli> total_time = end - start;
-  const double avg_inference_time = total_time.count() / num_samples;
-  LOG(INFO) << "Accuracy: " << (100.f * num_correct / num_samples) << "%";
+  const double avg_inference_time = total_time.count() / mnist_reader.getNumSamples();
+
+  LOG(INFO) << "Accuracy: " << (100.f * accuracy) << "%";
   LOG(INFO) << "Average inference time: " << avg_inference_time << "ms";
+
   return 0;
 }
