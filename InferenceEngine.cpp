@@ -37,13 +37,13 @@ InferenceEngine::InferenceEngine(const std::string &model_path,
       cv::Mat w(num_output_units, x_shape.area(), CV_32F);
       cv::Mat b(num_output_units, 1, CV_32F);
       layer = std::make_unique<DenseLayer>(w, b, blas);
-      LOG(INFO) << "Constructed Dense layer " << layer_config["name"] << "";
     } else if (layer_class_name == "Flatten") {
       layer = std::make_unique<FlattenLayer>(x_shape);
-      LOG(INFO) << "Constructed Flatten layer " << layer_config["name"] << "";
-    } else {
-      LOG(INFO) << layer_class_name << " layer " << layer_config["name"] << " is unsupported or ignored!";
+    } else if (layer_class_name == "Dropout") {
+      // Do nothing.
       continue;
+    } else {
+      LOG(FATAL) << layer_class_name << " layer " << layer_config["name"] << " is unsupported!";
     }
 
     x_shape = layer->outputShape();

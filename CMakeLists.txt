@@ -16,14 +16,17 @@ elseif ((CMAKE_CXX_COMPILER_ID MATCHES "MSVC") AND NOT CMAKE_CL_64)
 endif ()
 
 include("cmake/FindGlog.cmake")
+include("cmake/FindGFlags.cmake")
 
 find_package(OpenCV REQUIRED)
 find_package(Glog REQUIRED)
+find_package(GFlags REQUIRED)
 
 message(STATUS ${GLOG_INCLUDE_DIRS})
-include_directories(BEFORE ${GLOG_INCLUDE_DIRS})
+include_directories(BEFORE ${GLOG_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIRS})
 
 add_executable(lenet_inference lenet_main.cpp MnistReader.cpp InferenceEngine.cpp InferencePipeline.cpp
         blas/Blas.cpp
         layers/DenseLayer.cpp layers/FlattenLayer.cpp layers/ConvLayer.cpp)
-target_link_libraries(lenet_inference PRIVATE ${OpenCV_LIBS} ${GLOG_LIBRARIES} nlohmann_json::nlohmann_json)
+target_link_libraries(lenet_inference PRIVATE
+        ${OpenCV_LIBS} ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES} nlohmann_json::nlohmann_json)

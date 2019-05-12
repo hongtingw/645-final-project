@@ -15,9 +15,9 @@ git submodule update --init --recursive
 
 ## Prerequisites
 
-OpenCV
+You need to install **OpenCV**, **GLog** and **GFLAGS** on your machine.
 
-GLog
+They can be easily installed by **brew** on OS X and **apt** on Ubuntu.
 
 ## How to run
 
