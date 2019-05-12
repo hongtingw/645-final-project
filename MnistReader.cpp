@@ -1,5 +1,6 @@
 #include <iostream>
 #include <opencv2/core/mat.hpp>
+#include <glog/logging.h>
 #include "MnistReader.h"
 
 inline int readInt(std::istream& in) {
@@ -32,7 +33,7 @@ MnistReader::MnistReader(const std::string &mnist_image_path, const std::string 
   int num_labels = readInt(label_fin_);
   assert(num_labels == num_images_);
 
-  std::cout << num_images_ << " images available." << std::endl;
+  LOG(INFO) << num_images_ << " samples available.";
 }
 
 bool MnistReader::next(cv::Mat& img, uchar &label) {

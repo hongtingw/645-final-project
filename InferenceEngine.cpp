@@ -19,7 +19,6 @@ InferenceEngine::InferenceEngine(const std::string &model_path,
   for (const auto &layer_json : layers_json) {
     std::unique_ptr<Layer> layer;
     const std::string layer_class_name = layer_json["class_name"].get<std::string>();
-    LOG(INFO) << layer_class_name;
     const auto layer_config = layer_json["config"];
     if (layer_config.find("batch_input_shape") != layer_config.end()) {
       auto batch_input_shape = layer_config["batch_input_shape"];
@@ -38,12 +37,12 @@ InferenceEngine::InferenceEngine(const std::string &model_path,
       cv::Mat w(num_output_units, x_shape.area(), CV_32F);
       cv::Mat b(num_output_units, 1, CV_32F);
       layer = std::make_unique<DenseLayer>(w, b, blas);
-      LOG(INFO) << "Constructed Dense layer";
+      LOG(INFO) << "Constructed Dense layer " << layer_config["name"] << "";
     } else if (layer_class_name == "Flatten") {
       layer = std::make_unique<FlattenLayer>(x_shape);
-      LOG(INFO) << "Constructed Flatten layer";
+      LOG(INFO) << "Constructed Flatten layer " << layer_config["name"] << "";
     } else {
-      LOG(INFO) << "Layer class " << layer_class_name << " is unsupported or ignored!";
+      LOG(INFO) << layer_class_name << " layer " << layer_config["name"] << " is unsupported or ignored!";
       continue;
     }
 

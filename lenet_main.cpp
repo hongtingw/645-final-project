@@ -1,5 +1,6 @@
 #include <iostream>
 #include <glog/logging.h>
+#include <chrono>
 
 #include "InferenceEngine.h"
 #include "MnistReader.h"
@@ -30,15 +31,18 @@ int main(int argc, char* argv[]) {
   uchar label;
   int num_samples = 0;
   int num_correct = 0;
+  const std::chrono::time_point start = std::chrono::high_resolution_clock::now();
   while (mnist_reader.next(image, label)) {
     ++num_samples;
     uchar pred = inference_engine.predict(image);
     if (pred == label) {
       ++num_correct;
-    } else {
-      std::cout << "Misclassified " << int(label) << " into " << int(pred) << "!" << std::endl;
     }
   }
-  std::cout << "Accuracy: " << (100.f * num_correct / num_samples) << "%" << std::endl;
+  const std::chrono::time_point end = std::chrono::high_resolution_clock::now();
+  const std::chrono::duration<double, std::milli> total_time = end - start;
+  const double avg_inference_time = total_time.count() / num_samples;
+  LOG(INFO) << "Accuracy: " << (100.f * num_correct / num_samples) << "%";
+  LOG(INFO) << "Average inference time: " << avg_inference_time << "ms";
   return 0;
 }

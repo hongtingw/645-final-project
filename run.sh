@@ -6,7 +6,7 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j
 if [[ $? -eq 0 ]]; then
     cd ..
-    ./build/lenet_inference opencv --logtostderr=1
+    GLOG_logtostderr=1 ./build/lenet_inference opencv
 else
     cd ..
 fi
