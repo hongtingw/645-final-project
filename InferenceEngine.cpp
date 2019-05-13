@@ -35,7 +35,15 @@ InferenceEngine::InferenceEngine(const std::string &model_path,
       x_shape = cv::Size(dims[1], dims[0]);
     }
     if (layer_class_name == "Dense") {
-      // TODO(Hongting Wang): Read and fill in parameters.
+      DenseLayer::Activation activation;
+      const auto activation_name = layer_config["activation"];
+      if (activation_name == "relu") {
+        activation = DenseLayer::Activation::RELU;
+      } else if (activation_name == "softmax") {
+        activation = DenseLayer::Activation::SOFTMAX;
+      } else {
+        CHECK(false) << "Unsupported activation " << activation_name;
+      }
       int num_output_units = layer_config["units"].get<int>();
       cv::Mat w(num_output_units, x_shape.area(), CV_32F);
       weights_fin.read(reinterpret_cast<char *>(w.data), w.rows * w.cols * sizeof(float));
@@ -45,7 +53,7 @@ InferenceEngine::InferenceEngine(const std::string &model_path,
       weights_fin.read(reinterpret_cast<char *>(b.data), b.rows * b.cols * sizeof(float));
       CHECK(weights_fin) << "Error encountered when reading b (" << b.rows * b.cols * sizeof(float) << " bytes) "
                          << "for layer " << layer_config["name"];
-      layer = std::make_unique<DenseLayer>(w, b, blas);
+      layer = std::make_unique<DenseLayer>(w, b, blas, activation);
     } else if (layer_class_name == "Flatten") {
       layer = std::make_unique<FlattenLayer>(x_shape);
     } else if (layer_class_name == "Dropout") {
