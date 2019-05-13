@@ -37,7 +37,9 @@ def main():
         f.write(model.to_json())
     with open(os.path.join(output_dir, 'lenet_weights.bin'), 'wb') as f:
         for w in model.get_weights():
-            f.write(w[-1].tobytes())
+            weight_bytes = w.tobytes()
+            print("Writing {} bytes from shape {}...".format(len(weight_bytes), w.shape))
+            f.write(weight_bytes)
 
 
 if __name__ == "__main__":
