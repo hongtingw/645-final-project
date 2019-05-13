@@ -10,7 +10,6 @@
 
 DEFINE_string(mat_op_impl, "naive", "Select matrix operation implementation (naive, opencv, opt)");
 DEFINE_string(pipeline_type, "seq", "Select pipeline type (seq, batched, prefetch)");
-DEFINE_int32(batch_size, 256, "Batch size used in batched pipelines.");
 
 int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
@@ -30,17 +29,15 @@ int main(int argc, char *argv[]) {
   InferencePipeline::PipelineType pipelineType = InferencePipeline::PipelineType::SEQUENTIAL;
   if (FLAGS_pipeline_type == "seq") {
     pipelineType = InferencePipeline::PipelineType::SEQUENTIAL;
-  } else if (FLAGS_pipeline_type == "batched") {
-    pipelineType = InferencePipeline::PipelineType::BATCHED;
   } else if (FLAGS_pipeline_type == "prefetch") {
-    pipelineType = InferencePipeline::PipelineType::BATCHED_AND_PREFETCH;
+    pipelineType = InferencePipeline::PipelineType::PREFETCH;
   } else {
     LOG(FATAL) << "Unknown pipeline type name: " << FLAGS_mat_op_impl;
   }
 
   InferenceEngine inference_engine("model/lenet_model.json", "model/lenet_weights.bin", mat_op_impl);
   MnistReader mnist_reader("data/t10k-images-idx3-ubyte", "data/t10k-labels-idx1-ubyte");
-  InferencePipeline pipeline(InferencePipeline::PipelineType::SEQUENTIAL, FLAGS_batch_size);
+  InferencePipeline pipeline(InferencePipeline::PipelineType::SEQUENTIAL);
 
   const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 //  const std::chrono::time_point start = std::chrono::high_resolution_clock::now();

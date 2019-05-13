@@ -3,8 +3,8 @@
 
 #include "InferencePipeline.h"
 
-InferencePipeline::InferencePipeline(InferencePipeline::PipelineType pipeline_type, int batch_size) :
-    pipeline_type_(pipeline_type), batch_size_(batch_size) {
+InferencePipeline::InferencePipeline(InferencePipeline::PipelineType pipeline_type) :
+    pipeline_type_(pipeline_type) {
 
 }
 
@@ -12,10 +12,8 @@ double InferencePipeline::test(InferenceEngine &engine, MnistReader &reader) {
   switch (pipeline_type_) {
     case SEQUENTIAL:
       return runSequential(engine, reader);
-    case BATCHED:
-      return runBatched(engine, reader);
-    case BATCHED_AND_PREFETCH:
-      return runBatchedAndPrefetch(engine, reader);
+    case PREFETCH:
+      return runPrefetch(engine, reader);
     default:
       return 0;
   }
@@ -34,13 +32,7 @@ double InferencePipeline::runSequential(InferenceEngine &engine, MnistReader &re
   return static_cast<double>(num_correct) / reader.getNumSamples();
 }
 
-double InferencePipeline::runBatched(InferenceEngine &engine, MnistReader &reader) {
-  // TODO(Zhe YANG): Implement BatchedAndPrefetch pipeline. Specifically, collect inputs into batches, and feed the
-  // data in batches to the network. Need to implement batch processing in the layers.
-  return runSequential(engine, reader);
-}
-
-double InferencePipeline::runBatchedAndPrefetch(InferenceEngine &engine, MnistReader &reader) {
+double InferencePipeline::runPrefetch(InferenceEngine &engine, MnistReader &reader) {
   // TODO(Zhe YANG): Implement BatchedAndPrefetch pipeline. Batches are prepared in a separate thread from the network
   // processing.
   return runSequential(engine, reader);

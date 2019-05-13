@@ -9,9 +9,6 @@ if [[ $? -eq 0 ]]; then
     ./build/lenet_inference --logtostderr=1 --mat_op_impl=naive --pipeline_type=seq
     ./build/lenet_inference --logtostderr=1 --mat_op_impl=opencv --pipeline_type=seq
     ./build/lenet_inference --logtostderr=1 --mat_op_impl=opt --pipeline_type=seq
-    ./build/lenet_inference --logtostderr=1 --mat_op_impl=naive --pipeline_type=batched
-    ./build/lenet_inference --logtostderr=1 --mat_op_impl=opencv --pipeline_type=batched
-    ./build/lenet_inference --logtostderr=1 --mat_op_impl=opt --pipeline_type=batched
     ./build/lenet_inference --logtostderr=1 --mat_op_impl=naive --pipeline_type=prefetch
     ./build/lenet_inference --logtostderr=1 --mat_op_impl=opencv --pipeline_type=prefetch
     ./build/lenet_inference --logtostderr=1 --mat_op_impl=opt --pipeline_type=prefetch

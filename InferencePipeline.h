@@ -11,19 +11,17 @@ class InferencePipeline {
  public:
   enum PipelineType {
     SEQUENTIAL,
-    BATCHED,
-    BATCHED_AND_PREFETCH,
+    PREFETCH,
   };
 
-  InferencePipeline(PipelineType pipeline_type, int batch_size=256);
+  InferencePipeline(PipelineType pipeline_type);
 
   // Return accuracy.
   double test(InferenceEngine &engine, MnistReader &reader);
 
  private:
   double runSequential(InferenceEngine& engine, MnistReader& reader);
-  double runBatched(InferenceEngine& engine, MnistReader& reader);
-  double runBatchedAndPrefetch(InferenceEngine& engine, MnistReader& reader);
+  double runPrefetch(InferenceEngine &engine, MnistReader &reader);
 
   PipelineType pipeline_type_;
   int batch_size_;
