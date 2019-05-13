@@ -1,6 +1,3 @@
-/// Author: Kai Yu(cn.ken.yu@gmail.com)
-/// All rights reserved.
-
 #ifndef LENET_INFERENCE_INFERENCEPIPELINE_H
 #define LENET_INFERENCE_INFERENCEPIPELINE_H
 
@@ -24,7 +21,6 @@ class InferencePipeline {
   double runPrefetch(InferenceEngine &engine, MnistReader &reader);
 
   PipelineType pipeline_type_;
-  int batch_size_;
 };
 
 #endif //LENET_INFERENCE_INFERENCEPIPELINE_H
