@@ -35,7 +35,13 @@ double InferencePipeline::runSequential(InferenceEngine &engine, MnistReader &re
 class PrefetchReader {
  public:
   typedef std::pair<cv::Mat, uchar> Sample;
+  /**
+   * Create a reader with data prefetching.
+   * @param reader the basic MNIST reader.
+   * @param buffer_size size of the memory buffer.
+   */
   inline explicit PrefetchReader(MnistReader &reader, int buffer_size = 10000) : reader_(reader) {
+    // Start a thread for prefetching data into the memory buffer.
     prefetch_thread_ = std::thread([this, buffer_size]() {
       cv::Mat image;
       uchar label;
@@ -54,6 +60,13 @@ class PrefetchReader {
       }
     });
   }
+  /**
+   * Get the next sample. If it is already in the buffer, directly retrieve it and remove it from the buffer.
+   * Otherwise, this function call is blocked until the data is ready in the buffer.
+   * @param img the image in the sample.
+   * @param label the label of the sample.
+   * @return the next sample in the MNIST dataset.
+   */
   inline bool next(cv::Mat &img, uchar &label) {
     while (buffer_.empty() && !ended_) {
       usleep(1);

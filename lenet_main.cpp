@@ -40,12 +40,11 @@ int main(int argc, char *argv[]) {
   InferencePipeline pipeline(pipeline_type);
 
   const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-//  const std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
+  // Test the inference engine on the MNIST dataset.
   const double accuracy = pipeline.test(inference_engine, mnist_reader);
 
   const std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-//  const std::chrono::time_point end = std::chrono::high_resolution_clock::now();
   const std::chrono::duration<double, std::milli> total_time = end - start;
   const double avg_inference_time = total_time.count() / mnist_reader.getNumSamples();
 
